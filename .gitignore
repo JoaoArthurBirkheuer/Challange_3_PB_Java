@@ -8,6 +8,8 @@
 *.tar.gz
 *.rar
 
+*.properties
+
 # Arquivos de log e crash
 *.log
 hs_err_pid*

@@ -11,7 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -54,9 +53,6 @@ public class Produto extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Boolean ativo = true;
-
-    @Version
-    private Long version;
 
     @OneToMany(mappedBy = "produto")
     @Builder.Default

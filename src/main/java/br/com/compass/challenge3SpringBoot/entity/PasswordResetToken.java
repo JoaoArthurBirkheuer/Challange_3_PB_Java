@@ -14,7 +14,7 @@ import java.util.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "password_reset_tokens")
-public class PasswordResetToken {
+public class PasswordResetToken extends BaseEntity{
 
     @Id
     @GeneratedValue

@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "itens_carrinho")
-public class ItemCarrinho {
+public class ItemCarrinho extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
