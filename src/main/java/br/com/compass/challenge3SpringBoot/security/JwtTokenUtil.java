@@ -29,7 +29,8 @@ public class JwtTokenUtil {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(String username) {
+    @SuppressWarnings("deprecation")
+	public String generateToken(String username) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
@@ -37,13 +38,13 @@ public class JwtTokenUtil {
             .subject(username)
             .issuedAt(now)
             .expiration(expiry)
-            .signWith(key, SignatureAlgorithm.HS256) // Corrigido aqui
+            .signWith(key, SignatureAlgorithm.HS256)
             .compact();
     }
 
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
-            .verifyWith(key) // Corrigido aqui
+            .verifyWith(key)
             .build()
             .parseSignedClaims(token)
             .getPayload()
@@ -53,7 +54,7 @@ public class JwtTokenUtil {
     public boolean isTokenValid(String token) {
         try {
             Jwts.parser()
-                .verifyWith(key) // Corrigido aqui
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token);
             return true;
