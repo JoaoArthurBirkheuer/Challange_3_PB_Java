@@ -14,6 +14,18 @@ public class GlobalExceptionHandler {
                              .body(new RegisterResponseDTO(ex.getMessage()));
     }
 
+    @ExceptionHandler(PasswordResetTokenInvalidException.class)
+    public ResponseEntity<RegisterResponseDTO> handleTokenInvalido(PasswordResetTokenInvalidException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(new RegisterResponseDTO("Token inválido: " + ex.getMessage()));
+    }
+
+    @ExceptionHandler(PasswordUpdateException.class)
+    public ResponseEntity<RegisterResponseDTO> handleErroAtualizacaoSenha(PasswordUpdateException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(new RegisterResponseDTO("Erro ao atualizar a senha: " + ex.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RegisterResponseDTO> handleGeneric(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
