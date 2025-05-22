@@ -1,26 +1,30 @@
 package br.com.compass.challenge3SpringBoot.security;
 
-import br.com.compass.challenge3SpringBoot.service.CustomUserDetailsService;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+// import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+// import br.com.compass.challenge3SpringBoot.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenUtil jwtTokenUtil;
-	private final CustomUserDetailsService userDetailsService;
+	// private final CustomUserDetailsService userDetailsService;
 
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -41,12 +45,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		final String username = jwtTokenUtil.getUsernameFromToken(jwt);
 
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 			if (jwtTokenUtil.isTokenValid(jwt)) {
-				var authToken = new UsernamePasswordAuthenticationToken(userDetails, null,
-						userDetails.getAuthorities());
-				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(authToken);
+			    List<String> roles = jwtTokenUtil.getRolesFromToken(jwt);
+			    List<SimpleGrantedAuthority> authorities = roles.stream()
+			        .map(SimpleGrantedAuthority::new)
+			        .collect(Collectors.toList());
+
+			    var authToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+			    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+			    SecurityContextHolder.getContext().setAuthentication(authToken);
 			}
 		}
 

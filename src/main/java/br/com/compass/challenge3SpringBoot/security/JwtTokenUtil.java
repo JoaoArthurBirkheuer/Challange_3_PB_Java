@@ -1,8 +1,14 @@
 package br.com.compass.challenge3SpringBoot.security;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.JwtException;
@@ -10,8 +16,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-
-import javax.crypto.SecretKey;
 
 @Component
 public class JwtTokenUtil {
@@ -30,7 +34,7 @@ public class JwtTokenUtil {
     }
 
     @SuppressWarnings("deprecation")
-	public String generateToken(String username) {
+    public String generateToken(String username, Collection<? extends GrantedAuthority> authorities) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
@@ -38,9 +42,14 @@ public class JwtTokenUtil {
             .subject(username)
             .issuedAt(now)
             .expiration(expiry)
+            .claim("roles", authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()))
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
     }
+    
+    
 
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
@@ -61,5 +70,15 @@ public class JwtTokenUtil {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<String> getRolesFromToken(String token) {
+        return Jwts.parser()
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(token)
+            .getPayload()
+            .get("roles", List.class);
     }
 }

@@ -41,7 +41,7 @@ public class AuthenticationService {
         );
 
         User user = (User) authentication.getPrincipal();
-        String token = jwtTokenUtil.generateToken(user.getUsername());
+        String token = jwtTokenUtil.generateToken(user.getUsername(), user.getAuthorities());
         return new LoginResponseDTO(token);
     }
 
@@ -61,8 +61,9 @@ public class AuthenticationService {
     }
     
     public Usuario cadastrarUsuarioAdmin(Usuario usuario) {
-    	usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-    	usuario.addRole(br.com.compass.challenge3SpringBoot.entity.Role.ROLE_ADMIN);
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        usuario.getRoles().clear(); 
+        usuario.addRole(Role.ROLE_ADMIN);
         return usuarioRepository.save(usuario);
     }
     
