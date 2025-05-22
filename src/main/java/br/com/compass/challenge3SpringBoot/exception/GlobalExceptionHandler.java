@@ -26,6 +26,18 @@ public class GlobalExceptionHandler {
                              .body(new RegisterResponseDTO("Erro ao atualizar a senha: " + ex.getMessage()));
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<RegisterResponseDTO> handleEntidadeNaoEncontrada(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .body(new RegisterResponseDTO(ex.getMessage()));
+    }
+
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<RegisterResponseDTO> handleRegraNegocio(BusinessRuleException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                             .body(new RegisterResponseDTO(ex.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RegisterResponseDTO> handleGeneric(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
