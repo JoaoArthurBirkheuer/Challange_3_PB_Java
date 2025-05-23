@@ -41,12 +41,17 @@ public class AuthenticationService {
         );
 
         User user = (User) authentication.getPrincipal();
-        String token = jwtTokenUtil.generateToken(user.getUsername(), user.getAuthorities());
+
+        Usuario usuario = usuarioRepository.findByEmailAndDeletedFalse(user.getUsername())
+            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
+        String token = jwtTokenUtil.generateToken(usuario.getId(), user.getUsername(), user.getAuthorities());
         return new LoginResponseDTO(token);
     }
 
+
     public boolean emailExiste(String email) {
-        return usuarioRepository.findByEmail(email).isPresent();
+        return usuarioRepository.findByEmailAndDeletedFalse(email).isPresent();
     }
 
     public Usuario cadastrarUsuarioCliente(Usuario usuario) {
@@ -68,7 +73,7 @@ public class AuthenticationService {
     }
     
     public PasswordResetToken gerarTokenRedefinicao(String email) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
+        Usuario usuario = usuarioRepository.findByEmailAndDeletedFalse(email)
             .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         PasswordResetToken token = PasswordResetToken.builder()

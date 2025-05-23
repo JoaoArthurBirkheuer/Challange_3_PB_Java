@@ -56,7 +56,7 @@ public class AuthController {
     
     @PostMapping("/register/teste-admin")
     public ResponseEntity<RegisterResponseDTO> registrarPrimeiroAdmin(@Valid @RequestBody RegisterRequestDTO request) {
-        String email = "admin@ecommerce.com";
+        String email = "admin@exemplo.com";
 
         if (authService.emailExiste(email)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)

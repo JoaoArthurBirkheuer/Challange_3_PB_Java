@@ -97,4 +97,19 @@ public class ProductService {
         produto.setAtivo(false);
         produtoRepository.save(produto);
     }
+    
+    @Transactional(readOnly = true)
+    public PageResponseDTO<ProductResponseDTO> listarTodos(Pageable pageable) {
+        Page<Produto> pagina = produtoRepository.findAll(pageable);
+
+        return PageResponseDTO.<ProductResponseDTO>builder()
+                .content(pagina.getContent().stream().map(productMapper::toResponseDTO).collect(Collectors.toList()))
+                .page(pagina.getNumber())
+                .size(pagina.getSize())
+                .totalElements(pagina.getTotalElements())
+                .totalPages(pagina.getTotalPages())
+                .first(pagina.isFirst())
+                .last(pagina.isLast())
+                .build();
+    }
 }

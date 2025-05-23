@@ -34,7 +34,7 @@ public class JwtTokenUtil {
     }
 
     @SuppressWarnings("deprecation")
-    public String generateToken(String username, Collection<? extends GrantedAuthority> authorities) {
+    public String generateToken(Long userId, String username, Collection<? extends GrantedAuthority> authorities) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
@@ -42,6 +42,7 @@ public class JwtTokenUtil {
             .subject(username)
             .issuedAt(now)
             .expiration(expiry)
+            .claim("id", userId)
             .claim("roles", authorities.stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList()))

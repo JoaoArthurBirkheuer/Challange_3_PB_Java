@@ -22,7 +22,6 @@ public class AdminController {
 
     private final AuthenticationService authService;
 
-    // Apenas administradores podem registrar novos administradores
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RegisterResponseDTO> registrarNovoAdmin(@Valid @RequestBody RegisterRequestDTO request) {

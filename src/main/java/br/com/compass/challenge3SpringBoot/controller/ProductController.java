@@ -61,4 +61,10 @@ public class ProductController {
     public void inativar(@PathVariable Long id) {
         productService.inativar(id);
     }
+    
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public PageResponseDTO<ProductResponseDTO> listarTodos(Pageable pageable) {
+        return productService.listarTodos(pageable);
+    }
 }
