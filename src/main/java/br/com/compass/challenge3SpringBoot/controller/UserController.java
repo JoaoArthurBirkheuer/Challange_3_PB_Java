@@ -1,6 +1,5 @@
 package br.com.compass.challenge3SpringBoot.controller;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.compass.challenge3SpringBoot.dto.UserResponseDTO;
 import br.com.compass.challenge3SpringBoot.dto.UserUpdateRequestDTO;
+import br.com.compass.challenge3SpringBoot.dto.general.PageResponseDTO;
 import br.com.compass.challenge3SpringBoot.entity.Usuario;
 import br.com.compass.challenge3SpringBoot.service.UserService;
 import jakarta.validation.Valid;
@@ -32,7 +32,7 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<UserResponseDTO>> listarTodos(
+    public ResponseEntity<PageResponseDTO<UserResponseDTO>> listarTodos(
         @RequestParam(required = false) Boolean incluirDeletados,
         Pageable pageable) {
         

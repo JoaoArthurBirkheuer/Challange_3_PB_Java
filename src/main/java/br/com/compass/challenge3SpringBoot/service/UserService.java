@@ -1,6 +1,7 @@
 package br.com.compass.challenge3SpringBoot.service;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.compass.challenge3SpringBoot.dto.UserResponseDTO;
 import br.com.compass.challenge3SpringBoot.dto.UserUpdateRequestDTO;
+import br.com.compass.challenge3SpringBoot.dto.general.PageResponseDTO;
 import br.com.compass.challenge3SpringBoot.entity.Role;
 import br.com.compass.challenge3SpringBoot.entity.StatusPedido;
 import br.com.compass.challenge3SpringBoot.entity.Usuario;
@@ -32,21 +34,37 @@ public class UserService {
     private final PedidoRepository pedidoRepository;
     private final UserMapper usuarioMapper;
 
-    public Page<UserResponseDTO> listarTodos(Pageable pageable) {
-        return usuarioRepository.findAllByDeletedFalse(pageable)
-                .map(usuario -> {
-                    UserResponseDTO dto = usuarioMapper.toDTO(usuario);
-                    return dto;
-                });
+    public PageResponseDTO<UserResponseDTO> listarTodos(Pageable pageable) {
+        Page<Usuario> pagina = usuarioRepository.findAllByDeletedFalse(pageable);
+
+        return PageResponseDTO.<UserResponseDTO>builder()
+                .content(pagina.getContent().stream()
+                        .map(usuarioMapper::toDTO)
+                        .collect(Collectors.toList()))
+                .page(pagina.getNumber())
+                .size(pagina.getSize())
+                .totalElements(pagina.getTotalElements())
+                .totalPages(pagina.getTotalPages())
+                .first(pagina.isFirst())
+                .last(pagina.isLast())
+                .build();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<UserResponseDTO> listarTodosIncluindoDeletados(Pageable pageable) {
-        return usuarioRepository.findAll(pageable)
-                .map(usuario -> {
-                    UserResponseDTO dto = usuarioMapper.toDTO(usuario);
-                    return dto;
-                });
+    public PageResponseDTO<UserResponseDTO> listarTodosIncluindoDeletados(Pageable pageable) {
+        Page<Usuario> pagina = usuarioRepository.findAll(pageable);
+
+        return PageResponseDTO.<UserResponseDTO>builder()
+                .content(pagina.getContent().stream()
+                        .map(usuarioMapper::toDTO)
+                        .collect(Collectors.toList()))
+                .page(pagina.getNumber())
+                .size(pagina.getSize())
+                .totalElements(pagina.getTotalElements())
+                .totalPages(pagina.getTotalPages())
+                .first(pagina.isFirst())
+                .last(pagina.isLast())
+                .build();
     }
 
     public UserResponseDTO buscarPorId(Long id) {
@@ -109,5 +127,9 @@ public class UserService {
         if (pedidoRepository.existsByClienteIdAndStatusNotAndDeletedFalse(usuarioId, StatusPedido.ENTREGUE)) {
             throw new UserWithActiveOrdersException("Usuário possui pedidos em andamento e não pode ser deletado.");
         }
+    }
+    
+    public java.util.Optional<Usuario> buscarPorEmail(String email) {
+        return usuarioRepository.findByEmailAndDeletedFalse(email);
     }
 }

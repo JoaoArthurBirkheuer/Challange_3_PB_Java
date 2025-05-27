@@ -8,17 +8,24 @@ import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import br.com.compass.challenge3SpringBoot.repository.UsuarioRepository;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenUtil {
+
+    private final UsuarioRepository usuarioRepository;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -30,10 +37,12 @@ public class JwtTokenUtil {
 
     @PostConstruct
     public void init() {
+        if (jwtSecret.length() < 32) {
+            throw new IllegalArgumentException("A chave jwt.secret precisa ter ao menos 32 caracteres.");
+        }
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    @SuppressWarnings("deprecation")
     public String generateToken(Long userId, String username, Collection<? extends GrantedAuthority> authorities) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
@@ -49,8 +58,6 @@ public class JwtTokenUtil {
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
     }
-    
-    
 
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
@@ -72,14 +79,21 @@ public class JwtTokenUtil {
             return false;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
-	public List<String> getRolesFromToken(String token) {
+    public List<String> getRolesFromToken(String token) {
         return Jwts.parser()
             .verifyWith(key)
             .build()
             .parseSignedClaims(token)
             .getPayload()
             .get("roles", List.class);
+    }
+
+    public Long extractUserIdFromAuthentication(Authentication authentication) {
+        String username = authentication.getName();
+        return usuarioRepository.findByEmailAndDeletedFalse(username)
+            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"))
+            .getId();
     }
 }

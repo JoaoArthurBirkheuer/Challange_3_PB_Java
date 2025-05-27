@@ -51,7 +51,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .body(new RegisterResponseDTO(ex.getMessage()));
     }
-    
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<RegisterResponseDTO> handlePedidoNaoEncontrado(OrderNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .body(new RegisterResponseDTO("Pedido não encontrado: " + ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidOrderStatusUpdateException.class)
+    public ResponseEntity<RegisterResponseDTO> handleStatusInvalido(InvalidOrderStatusUpdateException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(new RegisterResponseDTO("Atualização de status inválida: " + ex.getMessage()));
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<RegisterResponseDTO> handleAcessoNegado(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
