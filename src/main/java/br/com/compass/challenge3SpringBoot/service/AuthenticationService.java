@@ -111,9 +111,4 @@ public class AuthenticationService {
 
         tokenRepository.delete(token);
     }
-
-    // No futuro incluir aqui:
-    // - reset de senha
-    // - confirmação de e-mail
-    // - envio de link por email
 }

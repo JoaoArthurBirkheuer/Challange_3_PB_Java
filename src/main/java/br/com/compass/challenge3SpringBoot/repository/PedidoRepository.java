@@ -22,4 +22,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     BigDecimal calcularLucroPorPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
     
     boolean existsByClienteIdAndStatusNotAndDeletedFalse(Long clienteId, StatusPedido status);
+    
+    Page<Pedido> findByCliente(Usuario cliente, Pageable pageable);
 }

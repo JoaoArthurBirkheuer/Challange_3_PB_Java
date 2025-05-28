@@ -24,7 +24,7 @@ import br.com.compass.challenge3SpringBoot.exception.CartItemNotFoundException;
 import br.com.compass.challenge3SpringBoot.exception.CartNotFoundException;
 import br.com.compass.challenge3SpringBoot.repository.CarrinhoRepository;
 import br.com.compass.challenge3SpringBoot.repository.ItemCarrinhoRepository;
-import br.com.compass.challenge3SpringBoot.repository.ItemPedidoRepository;
+// import br.com.compass.challenge3SpringBoot.repository.ItemPedidoRepository;
 import br.com.compass.challenge3SpringBoot.repository.PedidoRepository;
 import br.com.compass.challenge3SpringBoot.repository.ProdutoRepository;
 import br.com.compass.challenge3SpringBoot.repository.UsuarioRepository;
@@ -39,7 +39,7 @@ public class CartService {
     private final ProdutoRepository productRepository;
     private final UsuarioRepository userRepository;
     private final PedidoRepository pedidoRepository;
-    private final ItemPedidoRepository itemPedidoRepository;
+    // private final ItemPedidoRepository itemPedidoRepository;
 
     @Transactional
     public MessageResponseDTO adicionarItem(Long userId, CartItemRequestDTO dto) {
