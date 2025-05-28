@@ -34,21 +34,24 @@ public class AuthenticationService {
     private final JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenRepository tokenRepository;
+    private final EmailService emailService;
 
     public LoginResponseDTO login(LoginRequestDTO loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getSenha())
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(), loginRequest.getSenha()
+            )
         );
 
         User user = (User) authentication.getPrincipal();
 
         Usuario usuario = usuarioRepository.findByEmailAndDeletedFalse(user.getUsername())
-            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 
         String token = jwtTokenUtil.generateToken(usuario.getId(), user.getUsername(), user.getAuthorities());
+
         return new LoginResponseDTO(token);
     }
-
 
     public boolean emailExiste(String email) {
         return usuarioRepository.findByEmailAndDeletedFalse(email).isPresent();
@@ -64,24 +67,26 @@ public class AuthenticationService {
 
         return usuarioRepository.save(usuario);
     }
-    
+
     public Usuario cadastrarUsuarioAdmin(Usuario usuario) {
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        usuario.getRoles().clear(); 
+        usuario.getRoles().clear();
         usuario.addRole(Role.ROLE_ADMIN);
         return usuarioRepository.save(usuario);
     }
-    
-    public PasswordResetToken gerarTokenRedefinicao(String email) {
+
+    public void gerarTokenRedefinicao(String email) {
         Usuario usuario = usuarioRepository.findByEmailAndDeletedFalse(email)
-            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 
         PasswordResetToken token = PasswordResetToken.builder()
             .usuario(usuario)
             .expiresAt(LocalDateTime.now().plusMinutes(30))
             .build();
 
-        return tokenRepository.save(token);
+        PasswordResetToken tokenSalvo = tokenRepository.save(token);
+
+        emailService.sendPasswordResetEmail(usuario.getEmail(), tokenSalvo.getToken().toString());
     }
 
     public void atualizarSenhaComToken(PasswordUpdateDTO dto) {
@@ -108,7 +113,6 @@ public class AuthenticationService {
 
         usuario.setSenha(passwordEncoder.encode(dto.getNovaSenha()));
         usuarioRepository.save(usuario);
-
         tokenRepository.delete(token);
     }
 }

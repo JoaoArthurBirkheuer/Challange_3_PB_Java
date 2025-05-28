@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.compass.challenge3SpringBoot.dto.LoginRequestDTO;
 import br.com.compass.challenge3SpringBoot.dto.LoginResponseDTO;
 import br.com.compass.challenge3SpringBoot.dto.PasswordResetRequestDTO;
-import br.com.compass.challenge3SpringBoot.dto.PasswordResetTokenResponseDTO;
+//import br.com.compass.challenge3SpringBoot.dto.PasswordResetTokenResponseDTO;
 import br.com.compass.challenge3SpringBoot.dto.PasswordUpdateDTO;
 import br.com.compass.challenge3SpringBoot.dto.PasswordUpdateResponseDTO;
 import br.com.compass.challenge3SpringBoot.dto.RegisterRequestDTO;
 import br.com.compass.challenge3SpringBoot.dto.RegisterResponseDTO;
-import br.com.compass.challenge3SpringBoot.entity.PasswordResetToken;
+//import br.com.compass.challenge3SpringBoot.entity.PasswordResetToken;
 import br.com.compass.challenge3SpringBoot.entity.Usuario;
 import br.com.compass.challenge3SpringBoot.exception.EmailJaCadastradoException;
 // import br.com.compass.challenge3SpringBoot.security.JwtTokenUtil;
@@ -29,15 +29,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-    // private final AuthenticationManager authenticationManager;
-    // private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationService authService;
 
     @PostMapping("/login")
-    public LoginResponseDTO login(@RequestBody LoginRequestDTO loginRequest) {
-        return authService.login(loginRequest);
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
+        LoginResponseDTO response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
     }
-    
+
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
         if (authService.emailExiste(request.getEmail())) {
@@ -50,10 +49,11 @@ public class AuthController {
         usuario.setSenha(request.getSenha());
 
         authService.cadastrarUsuarioCliente(usuario);
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(new RegisterResponseDTO("Usuário registrado com sucesso!"));
+                             .body(new RegisterResponseDTO("Usuário registrado com sucesso."));
     }
-    
+
     @PostMapping("/register/teste-admin")
     public ResponseEntity<RegisterResponseDTO> registrarPrimeiroAdmin(@Valid @RequestBody RegisterRequestDTO request) {
         String email = "admin@exemplo.com";
@@ -71,19 +71,18 @@ public class AuthController {
         authService.cadastrarUsuarioAdmin(admin);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(new RegisterResponseDTO("Admin criado com sucesso!"));
+                             .body(new RegisterResponseDTO("Admin criado com sucesso."));
     }
-    
+
     @PostMapping("/update-password-request")
-    public ResponseEntity<PasswordResetTokenResponseDTO> solicitarReset(@RequestBody PasswordResetRequestDTO request) {
-        PasswordResetToken token = authService.gerarTokenRedefinicao(request.getEmail());
-        return ResponseEntity.ok(new PasswordResetTokenResponseDTO(token.getToken().toString(), token.getExpiresAt()));
+    public ResponseEntity<RegisterResponseDTO> solicitarReset(@RequestBody PasswordResetRequestDTO request) {
+        authService.gerarTokenRedefinicao(request.getEmail());
+        return ResponseEntity.ok(new RegisterResponseDTO("Token enviado por e-mail com sucesso."));
     }
 
     @PostMapping("/update-password")
-    public ResponseEntity<PasswordUpdateResponseDTO> atualizarSenha(@RequestBody PasswordUpdateDTO dto) {
+    public ResponseEntity<PasswordUpdateResponseDTO> atualizarSenha(@Valid @RequestBody PasswordUpdateDTO dto) {
         authService.atualizarSenhaComToken(dto);
         return ResponseEntity.ok(new PasswordUpdateResponseDTO("Senha atualizada com sucesso."));
     }
-
 }
