@@ -3,7 +3,7 @@ package br.com.compass.challenge3SpringBoot.exception;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpHeaders;
+//import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -129,6 +129,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(new RegisterResponseDTO("Acesso negado: " + ex.getMessage()));
+    }
+    
+    @ExceptionHandler(ReportBadRequestException.class)
+    public ResponseEntity<RegisterResponseDTO> handleReportBadRequest(ReportBadRequestException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(new RegisterResponseDTO(ex.getMessage()));
+    }
+
+    @ExceptionHandler(NoDataFoundException.class)
+    public ResponseEntity<RegisterResponseDTO> handleNoData(NoDataFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new RegisterResponseDTO(ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

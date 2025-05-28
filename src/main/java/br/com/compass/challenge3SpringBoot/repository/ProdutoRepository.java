@@ -6,15 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.util.List;
+//import java.util.List;
 
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     Page<Produto> findByAtivoTrueAndDeletedFalse(Pageable pageable);
 
     Page<Produto> findByNomeContainingIgnoreCaseAndAtivoTrueAndDeletedFalse(String nome, Pageable pageable);
-
-    @Query("SELECT p FROM Produto p WHERE p.estoque < :estoqueMinimo AND p.ativo = true AND p.deleted = false")
-    List<Produto> findProdutosComEstoqueBaixo(@Param("estoqueMinimo") Integer estoqueMinimo);
 
     @Query("SELECT p, SUM(ip.quantidade) as totalVendido " +
            "FROM Produto p JOIN p.itensPedido ip " +
@@ -25,4 +22,7 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     @Query("SELECT COUNT(ip) > 0 FROM ItemPedido ip WHERE ip.produto.id = :produtoId AND ip.pedido.deleted = false")
     boolean existsInPedidosAtivos(@Param("produtoId") Long produtoId);
+    
+    @Query(value = "SELECT * FROM produto WHERE estoque < :threshold", nativeQuery = true)
+    Page<Produto> findProdutosComEstoqueBaixo(@Param("threshold") int threshold, Pageable pageable);
 }
