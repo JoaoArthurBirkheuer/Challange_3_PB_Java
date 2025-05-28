@@ -50,7 +50,7 @@ public class OrderController {
         Usuario user = getAuthenticatedUser(authentication);
 
         if (!user.getId().equals(userId)) {
-            return ResponseEntity.status(403).build(); // Forbidden
+            return ResponseEntity.status(403).build(); 
         }
 
         OrderDetailDTO dto = orderService.buscarPorId(userId, orderId);

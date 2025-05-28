@@ -66,7 +66,7 @@ public class AuthController {
         Usuario admin = new Usuario();
         admin.setEmail(email);
         admin.setNome("Administrador");
-        admin.setSenha(request.getSenha()); // ou outro forte
+        admin.setSenha(request.getSenha());
 
         authService.cadastrarUsuarioAdmin(admin);
 

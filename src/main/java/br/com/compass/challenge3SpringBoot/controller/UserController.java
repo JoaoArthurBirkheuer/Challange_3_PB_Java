@@ -71,7 +71,6 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userId = ((Usuario) authentication.getPrincipal()).getId();
         
-        // Validação redundante (opcional, mas defensiva)
         if (!authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN")) 
                 && !id.equals(userId)) {
