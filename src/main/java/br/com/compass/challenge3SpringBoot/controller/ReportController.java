@@ -26,10 +26,17 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @PostMapping("/sales")
-    public ResponseEntity<SalesReportDTO> salesReport(@RequestBody SalesPeriodRequestDTO req) {
-        SalesReportDTO dto = reportService.salesReport(req.getFrom(), req.getTo(), req.getTopN());
-        return ResponseEntity.ok(dto);
+    @GetMapping("/sales")
+    public ResponseEntity<SalesReportDTO> salesReport(
+        @RequestParam String from,
+        @RequestParam String to,
+        @RequestParam(defaultValue = "5") int topN) {
+    
+    SalesReportDTO dto = reportService.salesReport(from, to, topN);
+    return ResponseEntity.ok(dto);
+        /*
+        /sales?from=01/01/2024&to=31/01/2024&topN=10
+        */
     }
 
     @GetMapping("/low-stock")
