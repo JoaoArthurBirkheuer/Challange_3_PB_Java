@@ -42,20 +42,15 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/{userId}/{orderId}")
+    @GetMapping("/{orderId}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<OrderDetailDTO> getOrderById(@PathVariable Long userId,
-                                                       @PathVariable Long orderId,
+    public ResponseEntity<OrderDetailDTO> getOrderById(@PathVariable Long orderId,
                                                        Authentication authentication) {
         Usuario user = getAuthenticatedUser(authentication);
-
-        if (!user.getId().equals(userId)) {
-            return ResponseEntity.status(403).build(); 
-        }
-
-        OrderDetailDTO dto = orderService.buscarPorId(userId, orderId);
+        OrderDetailDTO dto = orderService.buscarPorId(user.getId(), orderId);
         return ResponseEntity.ok(dto);
     }
+
 
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")

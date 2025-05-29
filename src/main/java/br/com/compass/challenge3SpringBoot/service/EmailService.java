@@ -2,6 +2,7 @@ package br.com.compass.challenge3SpringBoot.service;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Async
     public void sendPasswordResetEmail(String to, String token) {
         String subject = "Redefinição de senha";
         String text = """

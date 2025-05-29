@@ -17,7 +17,6 @@ public class ProductMapper {
                 .descricao(dto.getDescricao())
                 .preco(dto.getPreco())
                 .estoque(dto.getEstoque())
-                .ativo(dto.getAtivo())
                 .build();
     }
 
@@ -28,7 +27,6 @@ public class ProductMapper {
         produto.setDescricao(dto.getDescricao());
         produto.setPreco(dto.getPreco());
         produto.setEstoque(dto.getEstoque());
-        produto.setAtivo(dto.getAtivo());
     }
 
     public ProductResponseDTO toResponseDTO(Produto produto) {
@@ -41,6 +39,7 @@ public class ProductMapper {
                 .preco(produto.getPreco())
                 .estoque(produto.getEstoque())
                 .ativo(produto.getAtivo())
+                .deleted(produto.getDeleted())
                 .build();
     }
 }

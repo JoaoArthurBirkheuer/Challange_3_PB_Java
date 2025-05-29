@@ -43,7 +43,8 @@ public class JwtTokenUtil {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(Long userId, String username, Collection<? extends GrantedAuthority> authorities) {
+    @SuppressWarnings("deprecation")
+	public String generateToken(Long userId, String username, Collection<? extends GrantedAuthority> authorities) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 

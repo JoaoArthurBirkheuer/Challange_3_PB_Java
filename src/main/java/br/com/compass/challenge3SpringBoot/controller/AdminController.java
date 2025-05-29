@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.compass.challenge3SpringBoot.dto.RegisterRequestDTO;
 import br.com.compass.challenge3SpringBoot.dto.RegisterResponseDTO;
-import br.com.compass.challenge3SpringBoot.entity.Usuario;
+// import br.com.compass.challenge3SpringBoot.entity.Usuario; // No longer needed here
 import br.com.compass.challenge3SpringBoot.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +25,7 @@ public class AdminController {
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RegisterResponseDTO> registrarNovoAdmin(@Valid @RequestBody RegisterRequestDTO request) {
-        if (authService.emailExiste(request.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                                 .body(new RegisterResponseDTO("E-mail já cadastrado."));
-        }
-
-        Usuario novoAdmin = new Usuario();
-        novoAdmin.setEmail(request.getEmail());
-        novoAdmin.setNome(request.getNome());
-        novoAdmin.setSenha(request.getSenha());
-
-        authService.cadastrarUsuarioAdmin(novoAdmin);
+        authService.cadastrarUsuarioAdmin(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new RegisterResponseDTO("Administrador cadastrado com sucesso."));

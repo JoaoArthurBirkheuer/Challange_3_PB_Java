@@ -36,7 +36,6 @@ public class OrderService {
 
     private final OrderMapper orderMapper;
 
-    // ADMIN
     public PageResponseDTO<OrderSummaryDTO> listarTodos(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Pedido> pedidos = pedidoRepository.findAll(pageable);
@@ -56,7 +55,6 @@ public class OrderService {
                 .build();
     }
 
-    // CLIENTE
     public PageResponseDTO<OrderSummaryDTO> listarMeusPedidos(Long userId, int page, int size) {
         Usuario usuario = usuarioRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
@@ -79,7 +77,6 @@ public class OrderService {
                 .build();
     }
 
-    // CLIENTE
     public OrderDetailDTO buscarPorId(Long userId, Long orderId) {
         Pedido pedido = pedidoRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Pedido não encontrado"));
@@ -91,7 +88,6 @@ public class OrderService {
         return orderMapper.toDetailDTO(pedido);
     }
 
-    // ADMIN
     @Transactional
     public void atualizarStatus(Long orderId, StatusPedido novoStatus) {
         Pedido pedido = pedidoRepository.findById(orderId)
@@ -104,14 +100,12 @@ public class OrderService {
         }
 
         if (statusAtual != StatusPedido.CANCELADO && novoStatus == StatusPedido.CANCELADO) {
-            // Repor estoque
             for (ItemPedido item : pedido.getItens()) {
                 Produto produto = item.getProduto();
                 produto.setEstoque(produto.getEstoque() + item.getQuantidade());
                 produtoRepository.save(produto);
             }
         } else if (statusAtual == StatusPedido.CANCELADO && novoStatus != StatusPedido.CANCELADO) {
-            // Retirar estoque novamente
             for (ItemPedido item : pedido.getItens()) {
                 Produto produto = item.getProduto();
                 if (produto.getEstoque() < item.getQuantidade()) {

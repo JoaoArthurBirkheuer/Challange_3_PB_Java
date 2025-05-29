@@ -20,11 +20,12 @@ import br.com.compass.challenge3SpringBoot.entity.Pedido;
 import br.com.compass.challenge3SpringBoot.entity.Produto;
 import br.com.compass.challenge3SpringBoot.entity.StatusPedido;
 import br.com.compass.challenge3SpringBoot.entity.Usuario;
+import br.com.compass.challenge3SpringBoot.exception.BusinessRuleException;
 import br.com.compass.challenge3SpringBoot.exception.CartItemNotFoundException;
 import br.com.compass.challenge3SpringBoot.exception.CartNotFoundException;
+import br.com.compass.challenge3SpringBoot.exception.ResourceNotFoundException;
 import br.com.compass.challenge3SpringBoot.repository.CarrinhoRepository;
 import br.com.compass.challenge3SpringBoot.repository.ItemCarrinhoRepository;
-// import br.com.compass.challenge3SpringBoot.repository.ItemPedidoRepository;
 import br.com.compass.challenge3SpringBoot.repository.PedidoRepository;
 import br.com.compass.challenge3SpringBoot.repository.ProdutoRepository;
 import br.com.compass.challenge3SpringBoot.repository.UsuarioRepository;
@@ -39,22 +40,20 @@ public class CartService {
     private final ProdutoRepository productRepository;
     private final UsuarioRepository userRepository;
     private final PedidoRepository pedidoRepository;
-    // private final ItemPedidoRepository itemPedidoRepository;
 
     @Transactional
     public MessageResponseDTO adicionarItem(Long userId, CartItemRequestDTO dto) {
         Usuario user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
+            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
         Produto product = productRepository.findById(dto.getProductId())
-            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
 
         if (dto.getQuantity() <= 0) {
-            throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
+            throw new BusinessRuleException("A quantidade deve ser maior que zero."); 
         }
 
         if (product.getEstoque() < dto.getQuantity()) {
-            throw new RuntimeException("Estoque insuficiente para o produto: " + product.getNome());
+            throw new BusinessRuleException("Estoque insuficiente para o produto: " + product.getNome()); 
         }
 
         Carrinho cart = cartRepository.findByUsuarioAndDeletedFalse(user)
@@ -71,7 +70,7 @@ public class CartService {
             int novaQuantidade = item.getQuantidade() + dto.getQuantity();
 
             if (product.getEstoque() < novaQuantidade) {
-                throw new RuntimeException("Estoque insuficiente para aumentar a quantidade deste produto no carrinho.");
+                throw new BusinessRuleException("Estoque insuficiente para aumentar a quantidade deste produto no carrinho."); // Changed from RuntimeException
             }
 
             item.setQuantidade(novaQuantidade);
@@ -101,8 +100,7 @@ public class CartService {
     @Transactional
     public MessageResponseDTO limparCarrinho(Long userId) {
         Usuario user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
+            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
         Carrinho cart = cartRepository.findByUsuarioAndDeletedFalse(user)
             .orElseThrow(() -> new CartNotFoundException("Carrinho não encontrado"));
 
@@ -119,8 +117,7 @@ public class CartService {
     @Transactional(readOnly = true)
     public CartResponseDTO visualizarCarrinho(Long userId) {
         Usuario user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
+            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado")); 
         Carrinho cart = cartRepository.findByUsuarioAndDeletedFalse(user)
             .orElseThrow(() -> new CartNotFoundException("Carrinho não encontrado"));
 
@@ -153,15 +150,14 @@ public class CartService {
     @Transactional
     public MessageResponseDTO finalizarCompra(Long userId) {
         Usuario user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
+            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
         Carrinho cart = cartRepository.findByUsuarioAndDeletedFalse(user)
             .orElseThrow(() -> new CartNotFoundException("Carrinho não encontrado"));
 
         List<ItemCarrinho> items = itemRepository.findByCarrinhoAndDeletedFalse(cart);
 
         if (items.isEmpty()) {
-            throw new RuntimeException("Carrinho está vazio.");
+            throw new BusinessRuleException("Carrinho está vazio.");
         }
 
         BigDecimal total = BigDecimal.ZERO;
@@ -175,9 +171,8 @@ public class CartService {
 
         for (ItemCarrinho item : items) {
             Produto produto = item.getProduto();
-
             if (produto.getEstoque() < item.getQuantidade()) {
-                throw new RuntimeException("Estoque insuficiente para o produto: " + produto.getNome());
+                throw new BusinessRuleException("Estoque insuficiente para o produto: " + produto.getNome());
             }
 
             produto.setEstoque(produto.getEstoque() - item.getQuantidade());

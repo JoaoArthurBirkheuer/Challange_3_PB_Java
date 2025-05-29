@@ -28,6 +28,4 @@ public class ProductRequestDTO {
     @Min(value = 0, message = "O estoque deve ser zero ou maior.")
     private Integer estoque;
 
-    @NotNull(message = "O campo ativo é obrigatório.")
-    private Boolean ativo;
 }

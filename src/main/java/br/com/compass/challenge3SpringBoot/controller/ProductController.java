@@ -33,11 +33,15 @@ public class ProductController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public PageResponseDTO<ProductResponseDTO> listar(
-            @RequestParam(required = false) String nome,
-            Pageable pageable) {
-        return productService.listar(nome, pageable);
-    }
+         @RequestParam(required = false) String nome,
+         @RequestParam(required = false, defaultValue = "false") Boolean includeInactive, 
+         @RequestParam(required = false, defaultValue = "false") Boolean includeDeleted,
+         Pageable pageable) {
+     return productService.listar(nome, includeInactive, includeDeleted, pageable);
+ }
+
 
     @GetMapping("/{id}")
     public ProductResponseDTO buscarPorId(@PathVariable Long id) {
@@ -62,9 +66,9 @@ public class ProductController {
         productService.inativar(id);
     }
     
-    @GetMapping("/all")
+    @PatchMapping("/{id}/reactivate")
     @PreAuthorize("hasRole('ADMIN')")
-    public PageResponseDTO<ProductResponseDTO> listarTodos(Pageable pageable) {
-        return productService.listarTodos(pageable);
+    public void reativar(@PathVariable Long id) {
+        productService.reativar(id);
     }
 }

@@ -23,6 +23,10 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     @Query("SELECT COUNT(ip) > 0 FROM ItemPedido ip WHERE ip.produto.id = :produtoId AND ip.pedido.deleted = false")
     boolean existsInPedidosAtivos(@Param("produtoId") Long produtoId);
     
-    @Query(value = "SELECT * FROM produto WHERE estoque < :threshold", nativeQuery = true)
+    @Query(value = "SELECT * FROM produtos WHERE estoque < :threshold", nativeQuery = true)
     Page<Produto> findProdutosComEstoqueBaixo(@Param("threshold") int threshold, Pageable pageable);
+    
+    Page<Produto> findByDeletedFalse(Pageable pageable);
+    Page<Produto> findByNomeContainingIgnoreCaseAndDeletedFalse(String nome, Pageable pageable);
+    Page<Produto> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 }

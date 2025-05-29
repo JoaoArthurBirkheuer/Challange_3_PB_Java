@@ -102,7 +102,6 @@ public class UserService {
         usuarioRepository.save(usuario);
     }
 
-    // Métodos auxiliares privados
     private void validarPermissaoAcessoAoUsuario(Long id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario autenticado = usuarioRepository.findByEmailAndDeletedFalse(email)

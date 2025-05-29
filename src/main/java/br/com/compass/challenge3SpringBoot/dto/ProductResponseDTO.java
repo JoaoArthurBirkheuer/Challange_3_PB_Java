@@ -17,4 +17,5 @@ public class ProductResponseDTO {
     private BigDecimal preco;
     private Integer estoque;
     private Boolean ativo;
+    private Boolean deleted;
 }

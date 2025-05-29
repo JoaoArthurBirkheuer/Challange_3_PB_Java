@@ -2,7 +2,6 @@ package br.com.compass.challenge3SpringBoot.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,15 +33,13 @@ public class ReportService {
     private final ProdutoRepository produtoRepo;
     private final UsuarioRepository usuarioRepo;
 
-    private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
     public SalesReportDTO salesReport(String fromStr, String toStr, int topN) {
         LocalDate fromDate, toDate;
         try {
-            fromDate = LocalDate.parse(fromStr, fmt);
-            toDate = LocalDate.parse(toStr, fmt);
+        	fromDate = LocalDate.parse(fromStr);
+            toDate = LocalDate.parse(toStr);
         } catch (Exception e) {
-            throw new ReportBadRequestException("Datas inválidas, use dd/MM/yyyy");
+            throw new ReportBadRequestException("Datas inválidas, use YYYY-MM-DD");
         }
         if (toDate.isBefore(fromDate)) {
             throw new ReportBadRequestException("'to' deve ser maior ou igual a 'from'");
