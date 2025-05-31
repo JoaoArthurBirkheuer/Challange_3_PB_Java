@@ -66,7 +66,7 @@ public class CartService {
             int novaQuantidade = item.getQuantidade() + dto.getQuantity();
 
             if (product.getEstoque() < novaQuantidade) {
-                throw new BusinessRuleException("Estoque insuficiente para aumentar a quantidade deste produto no carrinho."); // Changed from RuntimeException
+                throw new BusinessRuleException("Estoque insuficiente para aumentar a quantidade deste produto no carrinho.");
             }
 
             item.setQuantidade(novaQuantidade);

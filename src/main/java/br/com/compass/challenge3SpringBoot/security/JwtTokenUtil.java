@@ -1,6 +1,6 @@
 package br.com.compass.challenge3SpringBoot.security;
 
-import io.jsonwebtoken.Claims; // Adicione este import
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -8,12 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-// import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-// import br.com.compass.challenge3SpringBoot.repository.UsuarioRepository;
 
 import javax.crypto.SecretKey;
 import java.util.Collection;
