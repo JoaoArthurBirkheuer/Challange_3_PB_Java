@@ -1,31 +1,29 @@
 package br.com.compass.challenge3SpringBoot.security;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.crypto.SecretKey;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
-
-import br.com.compass.challenge3SpringBoot.repository.UsuarioRepository;
+import io.jsonwebtoken.Claims; // Adicione este import
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+// import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
+
+// import br.com.compass.challenge3SpringBoot.repository.UsuarioRepository;
+
+import javax.crypto.SecretKey;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenUtil {
-
-    private final UsuarioRepository usuarioRepository;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -44,7 +42,7 @@ public class JwtTokenUtil {
     }
 
     @SuppressWarnings("deprecation")
-	public String generateToken(Long userId, String username, Collection<? extends GrantedAuthority> authorities) {
+    public String generateToken(Long userId, String username, Collection<? extends GrantedAuthority> authorities) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
@@ -68,6 +66,15 @@ public class JwtTokenUtil {
             .getPayload()
             .getSubject();
     }
+    
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+        return claims.get("id", Long.class);
+    }
 
     public boolean isTokenValid(String token) {
         try {
@@ -89,12 +96,5 @@ public class JwtTokenUtil {
             .parseSignedClaims(token)
             .getPayload()
             .get("roles", List.class);
-    }
-
-    public Long extractUserIdFromAuthentication(Authentication authentication) {
-        String username = authentication.getName();
-        return usuarioRepository.findByEmailAndDeletedFalse(username)
-            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"))
-            .getId();
     }
 }

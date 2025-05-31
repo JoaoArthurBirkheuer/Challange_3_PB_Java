@@ -1,6 +1,7 @@
 package br.com.compass.challenge3SpringBoot.controller;
 
 import org.springframework.http.HttpStatus;
+import br.com.compass.challenge3SpringBoot.dto.general.MessageResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,9 +12,7 @@ import br.com.compass.challenge3SpringBoot.dto.LoginRequestDTO;
 import br.com.compass.challenge3SpringBoot.dto.LoginResponseDTO;
 import br.com.compass.challenge3SpringBoot.dto.PasswordResetRequestDTO;
 import br.com.compass.challenge3SpringBoot.dto.PasswordUpdateDTO;
-import br.com.compass.challenge3SpringBoot.dto.PasswordUpdateResponseDTO;
 import br.com.compass.challenge3SpringBoot.dto.RegisterRequestDTO;
-import br.com.compass.challenge3SpringBoot.dto.RegisterResponseDTO;
 import br.com.compass.challenge3SpringBoot.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,22 +31,22 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<MessageResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
         authService.cadastrarUsuarioCliente(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(new RegisterResponseDTO("Usuário registrado com sucesso."));
+                             .body(new MessageResponseDTO("Usuário registrado com sucesso."));
     }
 
     @PostMapping("/update-password-request")
-    public ResponseEntity<RegisterResponseDTO> solicitarReset(@RequestBody PasswordResetRequestDTO request) {
+    public ResponseEntity<MessageResponseDTO> solicitarReset(@RequestBody PasswordResetRequestDTO request) {
         authService.gerarTokenRedefinicao(request.getEmail());
-        return ResponseEntity.ok(new RegisterResponseDTO("Token enviado por e-mail com sucesso."));
+        return ResponseEntity.ok(new MessageResponseDTO("Token enviado por e-mail com sucesso."));
     }
 
     @PostMapping("/update-password")
-    public ResponseEntity<PasswordUpdateResponseDTO> atualizarSenha(@Valid @RequestBody PasswordUpdateDTO dto) {
+    public ResponseEntity<MessageResponseDTO> atualizarSenha(@Valid @RequestBody PasswordUpdateDTO dto) {
         authService.atualizarSenhaComToken(dto);
-        return ResponseEntity.ok(new PasswordUpdateResponseDTO("Senha atualizada com sucesso."));
+        return ResponseEntity.ok(new MessageResponseDTO("Senha atualizada com sucesso."));
     }
 }

@@ -20,8 +20,9 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query("SELECT COALESCE(SUM(ip.quantidade * ip.precoUnitario), 0) FROM ItemPedido ip JOIN ip.pedido p WHERE p.data BETWEEN :inicio AND :fim AND p.deleted = false")
     BigDecimal calcularLucroPorPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
-    
-    boolean existsByClienteIdAndStatusNotAndDeletedFalse(Long clienteId, StatusPedido status);
+
+    @Query("SELECT COUNT(p) > 0 FROM Pedido p WHERE p.cliente.id = :usuarioId AND p.deleted = false AND p.status IN ('PENDENTE', 'PROCESSANDO', 'ENVIADO')")
+    boolean existsActiveOrdersByClienteId(@Param("usuarioId") Long usuarioId);
     
     Page<Pedido> findByCliente(Usuario cliente, Pageable pageable);
 }

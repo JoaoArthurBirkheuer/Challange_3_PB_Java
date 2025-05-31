@@ -6,11 +6,10 @@ import br.com.compass.challenge3SpringBoot.dto.general.PageResponseDTO;
 import br.com.compass.challenge3SpringBoot.entity.StatusPedido;
 import br.com.compass.challenge3SpringBoot.entity.Usuario;
 import br.com.compass.challenge3SpringBoot.service.OrderService;
-import br.com.compass.challenge3SpringBoot.service.UserService;
+import br.com.compass.challenge3SpringBoot.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,21 +18,14 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderService orderService;
-    private final UserService userService;
-
-    private Usuario getAuthenticatedUser(Authentication authentication) {
-        String email = authentication.getName();
-        return userService.buscarPorEmail(email)
-                .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
-    }
+    private final SecurityUtil securityUtil;
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public ResponseEntity<PageResponseDTO<OrderSummaryDTO>> listOrders(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Authentication authentication) {
-        Usuario user = getAuthenticatedUser(authentication);
+            @RequestParam(defaultValue = "10") int size) {
+        Usuario user = securityUtil.getAuthenticatedUserEntity();
 
         if (user.isAdmin()) {
             return ResponseEntity.ok(orderService.listarTodos(page, size));
@@ -44,10 +36,9 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<OrderDetailDTO> getOrderById(@PathVariable Long orderId,
-                                                       Authentication authentication) {
-        Usuario user = getAuthenticatedUser(authentication);
-        OrderDetailDTO dto = orderService.buscarPorId(user.getId(), orderId);
+    public ResponseEntity<OrderDetailDTO> getOrderById(@PathVariable Long orderId) {
+        Long userId = securityUtil.getAuthenticatedUserId(); 
+        OrderDetailDTO dto = orderService.buscarPorId(userId, orderId);
         return ResponseEntity.ok(dto);
     }
 

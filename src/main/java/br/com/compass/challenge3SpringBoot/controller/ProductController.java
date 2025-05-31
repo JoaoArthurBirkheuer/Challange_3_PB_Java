@@ -27,20 +27,19 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')") 
     public ProductResponseDTO criar(@RequestBody ProductRequestDTO dto) {
         return productService.criar(dto);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public PageResponseDTO<ProductResponseDTO> listar(
          @RequestParam(required = false) String nome,
-         @RequestParam(required = false, defaultValue = "false") Boolean includeInactive, 
+         @RequestParam(required = false, defaultValue = "false") Boolean includeInactive,
          @RequestParam(required = false, defaultValue = "false") Boolean includeDeleted,
          Pageable pageable) {
      return productService.listar(nome, includeInactive, includeDeleted, pageable);
- }
+    }
 
 
     @GetMapping("/{id}")
@@ -55,17 +54,17 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')") 
     public void deletar(@PathVariable Long id) {
         productService.deletar(id);
     }
 
     @PatchMapping("/{id}/inactivate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')") 
     public void inativar(@PathVariable Long id) {
         productService.inativar(id);
     }
-    
+
     @PatchMapping("/{id}/reactivate")
     @PreAuthorize("hasRole('ADMIN')")
     public void reativar(@PathVariable Long id) {

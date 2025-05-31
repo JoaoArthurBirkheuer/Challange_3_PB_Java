@@ -48,10 +48,6 @@ public class CartService {
         Produto product = productRepository.findById(dto.getProductId())
             .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
 
-        if (dto.getQuantity() <= 0) {
-            throw new BusinessRuleException("A quantidade deve ser maior que zero."); 
-        }
-
         if (product.getEstoque() < dto.getQuantity()) {
             throw new BusinessRuleException("Estoque insuficiente para o produto: " + product.getNome()); 
         }
